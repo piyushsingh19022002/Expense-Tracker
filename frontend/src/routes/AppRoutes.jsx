@@ -4,6 +4,8 @@ import PATHS from './paths.js';
 import DashboardLayout from '../components/layout/DashboardLayout.jsx';
 import Dashboard from '../pages/Dashboard/Dashboard.jsx';
 import Expenses from '../pages/Expenses/Expenses.jsx';
+import LoginPage from '../pages/LoginPage.jsx';
+import RegisterPage from '../pages/RegisterPage.jsx';
 import NotFound from '../pages/NotFound/NotFound.jsx';
 
 /**
@@ -14,6 +16,10 @@ const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public Authentication routes */}
+        <Route path={PATHS.LOGIN} element={<LoginPage />} />
+        <Route path={PATHS.REGISTER} element={<RegisterPage />} />
+
         {/* Main Application Layout Layer */}
         <Route path={PATHS.DASHBOARD} element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />

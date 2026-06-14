@@ -5,6 +5,8 @@
 export const PATHS = {
   DASHBOARD: '/',
   EXPENSES: '/expenses',
+  LOGIN: '/login',
+  REGISTER: '/register',
   NOT_FOUND: '*'
 };
 
