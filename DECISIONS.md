@@ -31,3 +31,15 @@ Zustand
 Reason:
 Authentication state is small.
 Context API is sufficient.
+
+# Decision 4
+
+Decision:
+Use Membership History
+
+Alternative:
+Delete members directly
+
+Reason:
+Users join and leave over time.
+Historical balances must remain accurate.

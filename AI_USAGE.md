@@ -39,3 +39,17 @@ User was logged out after browser refresh.
 
 Fix:
 Added localStorage token persistence and restore logic.
+
+## Group Management APIs
+
+Prompt:
+Implement Group Management APIs.
+
+Issue:
+AI suggested deleting membership records.
+
+How I Found It:
+Historical expense calculations would lose member history.
+
+Fix:
+Used leftAt timestamp instead of deletion.
