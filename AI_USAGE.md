@@ -109,3 +109,17 @@ How I Found It:
 
 Fix:
 Adjusted final participant share to absorb rounding difference.
+
+## Balance Calculation Engine
+
+Prompt:
+Implement balance calculation engine.
+
+Issue:
+AI suggested storing balances in database.
+
+How I Found It:
+Balances can become stale after expense updates.
+
+Fix:
+Calculate balances dynamically from expenses and shares.

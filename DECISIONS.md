@@ -66,3 +66,14 @@ Calculate every time.
 
 Reason:
 Performance and auditability.
+
+# Decision 7
+
+Decision:
+Calculate balances dynamically.
+
+Alternative:
+Store balances in database.
+
+Reason:
+Balances are derived values and may become inconsistent.
