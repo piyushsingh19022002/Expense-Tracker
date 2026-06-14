@@ -1,0 +1,147 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ----------------- Enums -----------------
+
+enum MembershipStatus {
+  ACTIVE
+  LEFT
+}
+
+enum AnomalyStatus {
+  PENDING
+  RESOLVED
+  IGNORED
+}
+
+// ----------------- Models -----------------
+
+model User {
+  id               String               @id @default(uuid())
+  email            String               @unique
+  name             String
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  
+  // Relations
+  memberships      Membership[]
+  paidExpenses     Expense[]            @relation("ExpensesPaid")
+  createdExpenses  Expense[]            @relation("ExpensesCreated")
+  expenseShares    ExpenseParticipant[]
+  sentSettlements  Settlement[]         @relation("SettlementsSent")
+  rcvdSettlements  Settlement[]         @relation("SettlementsReceived")
+  resolvedAnomalies ImportAnomaly[]     @relation("AnomaliesResolved")
+
+  @@map("users")
+}
+
+model Group {
+  id          String       @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Relations
+  memberships Membership[]
+  expenses    Expense[]
+  settlements Settlement[]
+
+  @@map("groups")
+}
+
+model Membership {
+  id        String           @id @default(uuid())
+  groupId   String
+  userId    String
+  status    MembershipStatus @default(ACTIVE)
+  joinedAt  DateTime         @default(now())
+  leftAt    DateTime?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  // Mapped Relations
+  group     Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@map("memberships")
+}
+
+model Expense {
+  id           String               @id @default(uuid())
+  groupId      String
+  description  String
+  amount       Decimal              @db.Decimal(12, 2)
+  currency     String               @default("USD")
+  date         DateTime
+  paidById     String
+  createdById  String
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  // Mapped Relations
+  group        Group                @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  paidBy       User                 @relation("ExpensesPaid", fields: [paidById], references: [id], onDelete: Restrict)
+  createdBy    User                 @relation("ExpensesCreated", fields: [createdById], references: [id], onDelete: Restrict)
+  participants ExpenseParticipant[]
+
+  @@map("expenses")
+}
+
+model ExpenseParticipant {
+  id        String   @id @default(uuid())
+  expenseId String
+  userId    String
+  share     Decimal  @db.Decimal(12, 2)
+  createdAt DateTime @default(now())
+
+  // Mapped Relations
+  expense   Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@unique([expenseId, userId])
+  @@map("expense_participants")
+}
+
+model Settlement {
+  id        String   @id @default(uuid())
+  groupId   String
+  payerId   String
+  payeeId   String
+  amount    Decimal  @db.Decimal(12, 2)
+  currency  String   @default("USD")
+  date      DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Mapped Relations
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  payer     User     @relation("SettlementsSent", fields: [payerId], references: [id], onDelete: Restrict)
+  payee     User     @relation("SettlementsReceived", fields: [payeeId], references: [id], onDelete: Restrict)
+
+  @@map("settlements")
+}
+
+model ImportAnomaly {
+  id              String        @id @default(uuid())
+  fileName        String
+  rawContent      Json          // Raw JSON row payload that failed parsing/validation
+  reason          String        // Description of validation breakdown
+  status          AnomalyStatus @default(PENDING)
+  resolvedById    String?
+  resolvedAt      DateTime?
+  resolutionNotes String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Mapped Relations
+  resolvedBy      User?         @relation("AnomaliesResolved", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  @@map("import_anomalies")
+}
