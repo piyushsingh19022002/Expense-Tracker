@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import PATHS from '../../routes/paths.js';
-import { LayoutDashboard, Wallet, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Wallet, Settings, LogOut, Users } from 'lucide-react';
 import useAuth from '../../hooks/useAuth.js';
 
 /**
@@ -20,6 +20,11 @@ const Sidebar = () => {
       name: 'Expenses',
       path: PATHS.EXPENSES,
       icon: Wallet
+    },
+    {
+      name: 'Groups',
+      path: PATHS.GROUPS,
+      icon: Users
     }
   ];
 

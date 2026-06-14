@@ -53,3 +53,31 @@ Historical expense calculations would lose member history.
 
 Fix:
 Used leftAt timestamp instead of deletion.
+
+## Group UI Components
+
+Prompt:
+Build Group Management UI.
+
+Issue:
+AI placed API calls directly inside every component.
+
+How I Found It:
+Code duplication and maintenance issues.
+
+Fix:
+Created centralized groupService.js.
+
+## Expense Management APIs
+
+Prompt:
+Implement Expense APIs.
+
+Issue:
+AI suggested storing participants as JSON array.
+
+How I Found It:
+Would complicate joins and balance calculations.
+
+Fix:
+Used ExpenseParticipant relational table.

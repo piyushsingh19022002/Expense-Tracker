@@ -43,3 +43,15 @@ Delete members directly
 Reason:
 Users join and leave over time.
 Historical balances must remain accurate.
+
+# Decision 5
+
+Decision:
+Use ExpenseParticipant table.
+
+Alternative:
+Store participants as JSON.
+
+Reason:
+Relational integrity.
+Split calculations become easier.

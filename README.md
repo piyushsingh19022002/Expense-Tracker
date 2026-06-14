@@ -97,3 +97,9 @@ All failed operations (e.g. database failures, validation errors) return standar
   "stack": "ApiError: API resource not found... (only visible in development mode)"
 }
 ```
+
+Implemented:
+
+- Group Management
+- Member Management
+- Membership Timeline Support

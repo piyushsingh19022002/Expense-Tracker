@@ -5,6 +5,7 @@ import ProtectedRoute from './ProtectedRoute.jsx';
 import DashboardLayout from '../components/layout/DashboardLayout.jsx';
 import Dashboard from '../pages/Dashboard/Dashboard.jsx';
 import Expenses from '../pages/Expenses/Expenses.jsx';
+import GroupsPage from '../pages/GroupsPage.jsx';
 import LoginPage from '../pages/LoginPage.jsx';
 import RegisterPage from '../pages/RegisterPage.jsx';
 import NotFound from '../pages/NotFound/NotFound.jsx';
@@ -26,6 +27,7 @@ const AppRoutes = () => {
           <Route path={PATHS.DASHBOARD} element={<DashboardLayout />}>
             <Route index element={<Dashboard />} />
             <Route path={PATHS.EXPENSES} element={<Expenses />} />
+            <Route path={PATHS.GROUPS} element={<GroupsPage />} />
           </Route>
         </Route>
 
