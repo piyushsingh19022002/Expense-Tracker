@@ -165,3 +165,18 @@ Future anomaly reports could not reference original CSV rows.
 
 Fix:
 Added rowNumber field to every parsed record.
+
+## CSV Upload Interface
+
+Prompt:
+Build CSV Upload Interface.
+
+Issue:
+AI forgot upload progress handling.
+
+How I Found It:
+Large file uploads gave no user feedback.
+
+Fix:
+Added Axios upload progress tracking.
+

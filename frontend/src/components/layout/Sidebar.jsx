@@ -1,7 +1,6 @@
-import React from 'react';
 import { NavLink } from 'react-router-dom';
 import PATHS from '../../routes/paths.js';
-import { LayoutDashboard, Wallet, Settings, LogOut, Users } from 'lucide-react';
+import { FileUp, LayoutDashboard, Wallet, Settings, LogOut, Users } from 'lucide-react';
 import useAuth from '../../hooks/useAuth.js';
 
 /**
@@ -25,6 +24,11 @@ const Sidebar = () => {
       name: 'Groups',
       path: PATHS.GROUPS,
       icon: Users
+    },
+    {
+      name: 'Imports',
+      path: PATHS.IMPORTS,
+      icon: FileUp
     }
   ];
 
