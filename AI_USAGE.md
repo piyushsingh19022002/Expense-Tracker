@@ -123,3 +123,17 @@ Balances can become stale after expense updates.
 
 Fix:
 Calculate balances dynamically from expenses and shares.
+
+## Settlement Module
+
+Prompt:
+Implement settlement module.
+
+Issue:
+AI suggested updating balances directly in database.
+
+How I Found It:
+Balances would become inconsistent after expense edits.
+
+Fix:
+Store settlement records and calculate balances dynamically.

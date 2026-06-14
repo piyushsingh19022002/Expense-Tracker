@@ -77,3 +77,15 @@ Store balances in database.
 
 Reason:
 Balances are derived values and may become inconsistent.
+
+# Decision 8
+
+Decision:
+Store settlements separately.
+
+Alternative:
+Update balances directly.
+
+Reason:
+Balances are derived values.
+Settlement history must remain auditable.
