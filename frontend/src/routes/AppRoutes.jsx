@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import PATHS from './paths.js';
+import ProtectedRoute from './ProtectedRoute.jsx';
 import DashboardLayout from '../components/layout/DashboardLayout.jsx';
 import Dashboard from '../pages/Dashboard/Dashboard.jsx';
 import Expenses from '../pages/Expenses/Expenses.jsx';
@@ -21,9 +22,11 @@ const AppRoutes = () => {
         <Route path={PATHS.REGISTER} element={<RegisterPage />} />
 
         {/* Main Application Layout Layer */}
-        <Route path={PATHS.DASHBOARD} element={<DashboardLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path={PATHS.EXPENSES} element={<Expenses />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path={PATHS.DASHBOARD} element={<DashboardLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path={PATHS.EXPENSES} element={<Expenses />} />
+          </Route>
         </Route>
 
         {/* Fallback 404 handler outside the main layout */}

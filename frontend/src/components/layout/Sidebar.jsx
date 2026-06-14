@@ -1,12 +1,14 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import PATHS from '../../routes/paths.js';
-import { LayoutDashboard, Wallet, Settings } from 'lucide-react';
+import { LayoutDashboard, Wallet, Settings, LogOut } from 'lucide-react';
+import useAuth from '../../hooks/useAuth.js';
 
 /**
  * @description Sidebar navigation container with active indicators.
  */
 const Sidebar = () => {
+  const { logout } = useAuth();
   const navigationItems = [
     {
       name: 'Dashboard',
@@ -55,12 +57,19 @@ const Sidebar = () => {
         })}
       </nav>
 
-      {/* Footer Settings Link */}
-      <div className="border-t border-slate-800/60 p-4">
+      {/* Footer Settings & Logout Links */}
+      <div className="border-t border-slate-800/60 p-4 space-y-1.5">
         <div className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-brand-text-secondary hover:bg-slate-800/50 hover:text-white transition-all duration-200 cursor-pointer">
           <Settings size={18} />
           <span>Settings</span>
         </div>
+        <button
+          onClick={logout}
+          className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-brand-danger/80 hover:bg-brand-danger/10 hover:text-brand-danger transition-all duration-200 cursor-pointer"
+        >
+          <LogOut size={18} className="stroke-[2]" />
+          <span>Log Out</span>
+        </button>
       </div>
     </aside>
   );

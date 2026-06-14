@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../../services/authService.js';
+import useAuth from '../../hooks/useAuth.js';
 import Button from '../common/Button.jsx';
 import { Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 import PATHS from '../../routes/paths.js';
@@ -14,6 +14,7 @@ const LoginForm = () => {
     mode: 'onTouched'
   });
   
+  const { login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -25,20 +26,13 @@ const LoginForm = () => {
     setServerError('');
     setSuccessMessage('');
     try {
-      const response = await loginUser(data.email, data.password);
-      if (response?.success) {
-        setSuccessMessage('Successfully authenticated! Accessing workspace...');
-        
-        // Persist token in localStorage
-        if (response.data?.token) {
-          localStorage.setItem('auth_token', response.data.token);
-        }
-
-        // Slight timeout for transition experience
-        setTimeout(() => {
-          navigate(PATHS.DASHBOARD);
-        }, 1200);
-      }
+      await login(data.email, data.password);
+      setSuccessMessage('Successfully authenticated! Accessing workspace...');
+      
+      // Slight timeout for transition experience
+      setTimeout(() => {
+        navigate(PATHS.DASHBOARD);
+      }, 1200);
     } catch (error) {
       setServerError(error.message || 'Authentication failed. Please check your credentials.');
     } finally {

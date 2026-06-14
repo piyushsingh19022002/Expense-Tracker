@@ -28,3 +28,11 @@ export const registerUser = async (name, email, password) => {
 export const logoutUser = async () => {
   return apiClient.post('/auth/logout');
 };
+
+/**
+ * @description Fetches the currently authenticated user's profile details.
+ * @returns {Promise<Object>} API Response containing profile context
+ */
+export const fetchCurrentUser = async () => {
+  return apiClient.get('/auth/me');
+};

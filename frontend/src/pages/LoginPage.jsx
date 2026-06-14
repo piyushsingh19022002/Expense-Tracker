@@ -1,13 +1,29 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import Card from '../components/common/Card.jsx';
 import LoginForm from '../components/auth/LoginForm.jsx';
 import PATHS from '../routes/paths.js';
+import useAuth from '../hooks/useAuth.js';
+import Spinner from '../components/common/Spinner.jsx';
 
 /**
  * @description Authentication Login Page wrapper.
  */
 const LoginPage = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-brand-bg">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (user) {
+    return <Navigate to={PATHS.DASHBOARD} replace />;
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-brand-bg px-4 py-12 relative overflow-hidden">
       {/* Visual background ambient blurs for premium glassmorphic feeling */}

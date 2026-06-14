@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { checkHealth } from '../../api/health.js';
 import { Wifi, WifiOff, Bell, User } from 'lucide-react';
+import useAuth from '../../hooks/useAuth.js';
 
 /**
  * @description Dashboard header. Shows workspace info, backend state, and profile card.
  */
 const Header = () => {
+  const { user } = useAuth();
   const [isOnline, setIsOnline] = useState(null);
 
   useEffect(() => {
@@ -58,11 +60,11 @@ const Header = () => {
         {/* User Card */}
         <div className="flex items-center gap-3 border-l border-slate-800/80 pl-4">
           <div className="flex flex-col text-right">
-            <span className="text-sm font-medium text-brand-text-primary">Piyush Sengar</span>
-            <span className="text-[11px] text-brand-text-secondary">Administrator</span>
+            <span className="text-sm font-medium text-brand-text-primary">{user?.name || 'Guest User'}</span>
+            <span className="text-[11px] text-brand-text-secondary">{user?.role || user?.email || 'Member'}</span>
           </div>
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-accent/10 border border-brand-accent/25 text-brand-accent font-semibold">
-            <User size={16} />
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-accent/10 border border-brand-accent/25 text-brand-accent font-semibold uppercase">
+            {user?.name ? user.name.charAt(0) : <User size={16} />}
           </div>
         </div>
       </div>

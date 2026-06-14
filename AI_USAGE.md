@@ -25,3 +25,17 @@ Button remained clickable during API request.
 
 Fix:
 Added loading state and disabled submit button during requests.
+
+## Auth Context and Protected Routes
+
+Prompt:
+Implement Auth Context and Protected Routes.
+
+Issue:
+AI forgot session restoration after page refresh.
+
+How I Found It:
+User was logged out after browser refresh.
+
+Fix:
+Added localStorage token persistence and restore logic.
