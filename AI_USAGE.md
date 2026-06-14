@@ -151,3 +151,17 @@ Users still had to manually calculate payments.
 
 Fix:
 Added "Who Owes Whom" section showing debtor-creditor relationships.
+
+## CSV Parser
+
+Prompt:
+Implement CSV parser infrastructure.
+
+Issue:
+AI ignored row numbers during parsing.
+
+How I Found It:
+Future anomaly reports could not reference original CSV rows.
+
+Fix:
+Added rowNumber field to every parsed record.

@@ -100,3 +100,14 @@ Show only net balances.
 
 Reason:
 Provides actionable settlement information.
+
+# Decision 10
+
+Decision:
+Store ImportBatch records.
+
+Alternative:
+Process CSV directly without history.
+
+Reason:
+Auditability and import tracking.
