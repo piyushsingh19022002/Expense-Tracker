@@ -89,3 +89,14 @@ Update balances directly.
 Reason:
 Balances are derived values.
 Settlement history must remain auditable.
+
+# Decision 9
+
+Decision:
+Show debtor-creditor relationships.
+
+Alternative:
+Show only net balances.
+
+Reason:
+Provides actionable settlement information.

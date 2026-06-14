@@ -137,3 +137,17 @@ Balances would become inconsistent after expense edits.
 
 Fix:
 Store settlement records and calculate balances dynamically.
+
+## Balance Dashboard
+
+Prompt:
+Build Balance Dashboard.
+
+Issue:
+AI displayed only net balances.
+
+How I Found It:
+Users still had to manually calculate payments.
+
+Fix:
+Added "Who Owes Whom" section showing debtor-creditor relationships.

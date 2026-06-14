@@ -109,3 +109,10 @@ Implemented:
 - Expense Management
 - Expense CRUD
 - Participant Selection
+
+Implemented:
+
+- Balance Dashboard
+- User Balance Summary
+- Settlement History
+- Who Owes Whom View
