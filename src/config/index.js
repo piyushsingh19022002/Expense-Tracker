@@ -21,10 +21,30 @@ if (!ALLOWED_ENVIRONMENTS.includes(env)) {
 // CORS settings - can be wildcard '*' or a comma-separated list of origins
 const corsOrigin = process.env.CORS_ORIGIN || '*';
 
+// Validate JWT configuration
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret && env === 'production') {
+  throw new Error('Configuration Error: JWT_SECRET environment variable is required in production.');
+}
+const finalJwtSecret = jwtSecret || 'default_fallback_jwt_secret_dev_only';
+
+const jwtExpiry = process.env.JWT_EXPIRY || '24h';
+const jwtCookieName = process.env.JWT_COOKIE_NAME || 'auth_token';
+
+// Validate DATABASE_URL configuration
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  throw new Error('Configuration Error: DATABASE_URL environment variable is required.');
+}
+
 export const config = Object.freeze({
   port,
   env,
   corsOrigin,
+  databaseUrl,
+  jwtSecret: finalJwtSecret,
+  jwtExpiry,
+  jwtCookieName,
   isProduction: env === 'production',
   isDevelopment: env === 'development',
   isTest: env === 'test'

@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 import config from './config/index.js';
 import logger from './utils/logger.js';
 import rootRouter from './routes/index.js';
@@ -23,9 +24,10 @@ app.use(cors(corsOptions));
 const morganFormat = config.isProduction ? 'combined' : 'dev';
 app.use(morgan(morganFormat, { stream: logger.stream }));
 
-// 3. Body Parsing Middlewares with size limit security
+// 3. Body Parsing & Cookie Parsing Middlewares with size limit security
 app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ extended: true, limit: '16kb' }));
+app.use(cookieParser());
 
 // 4. API Routes Mounting
 app.use('/api/v1', rootRouter);

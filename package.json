@@ -9,13 +9,20 @@
     "dev": "nodemon src/server.js"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-rate-limit": "^8.5.2",
+    "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.0",
+    "pg": "^8.21.0",
     "prisma": "^7.8.0",
-    "winston": "^3.13.0"
+    "winston": "^3.13.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"
