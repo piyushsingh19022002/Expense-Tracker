@@ -55,3 +55,14 @@ Store participants as JSON.
 Reason:
 Relational integrity.
 Split calculations become easier.
+
+# Decision 6
+
+Decision:
+Store calculated participant shares.
+
+Alternative:
+Calculate every time.
+
+Reason:
+Performance and auditability.

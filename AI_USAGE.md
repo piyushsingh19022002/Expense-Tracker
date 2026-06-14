@@ -95,3 +95,17 @@ Large amount of duplicated code.
 
 Fix:
 Created reusable ExpenseForm component.
+
+## Expense Calculation Engine
+
+Prompt:
+Implement equal, exact, and percentage split engine.
+
+Issue:
+AI ignored rounding differences in equal split.
+
+How I Found It:
+₹1000 split among 3 users resulted in total ₹999.99.
+
+Fix:
+Adjusted final participant share to absorb rounding difference.
