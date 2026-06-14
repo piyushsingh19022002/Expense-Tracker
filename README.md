@@ -103,3 +103,9 @@ Implemented:
 - Group Management
 - Member Management
 - Membership Timeline Support
+
+Implemented:
+
+- Expense Management
+- Expense CRUD
+- Participant Selection

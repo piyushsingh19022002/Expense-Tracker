@@ -81,3 +81,17 @@ Would complicate joins and balance calculations.
 
 Fix:
 Used ExpenseParticipant relational table.
+
+## Expense Management UI
+
+Prompt:
+Build Expense Management UI.
+
+Issue:
+AI generated separate forms for create and edit.
+
+How I Found It:
+Large amount of duplicated code.
+
+Fix:
+Created reusable ExpenseForm component.
