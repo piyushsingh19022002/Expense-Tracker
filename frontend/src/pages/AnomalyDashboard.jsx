@@ -7,7 +7,7 @@ import AnomalyTable from '../components/anomalies/AnomalyTable.jsx';
 import EditAnomalyModal from '../components/anomalies/EditAnomalyModal.jsx';
 import ReviewHistoryDrawer from '../components/anomalies/ReviewHistoryDrawer.jsx';
 import Button from '../components/common/Button.jsx';
-import Card from '../common/Card.jsx';
+import Card from '../components/common/Card.jsx';
 
 const AnomalyDashboard = () => {
   const { batchId } = useParams();
@@ -188,6 +188,10 @@ const AnomalyDashboard = () => {
         </div>
 
         <div className="flex gap-2">
+          <Button onClick={() => navigate(`/imports/${batchId}/report`)} variant="outline" className="gap-2">
+            <FileText size={12} />
+            View Report
+          </Button>
           <Button onClick={fetchDashboardData} variant="outline" className="gap-2">
             <RefreshCw size={12} />
             Refresh

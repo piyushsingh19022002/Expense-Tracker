@@ -145,3 +145,14 @@ Card-based review UI.
 
 Reason:
 Review workflows are data-intensive and benefit from tabular display.
+
+# Decision 14
+
+Decision:
+Provide downloadable import reports.
+
+Alternative:
+Display report only in UI.
+
+Reason:
+Reports may be shared, archived, or reviewed later.

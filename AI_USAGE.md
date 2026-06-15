@@ -235,3 +235,17 @@ Large imports became difficult to review.
 
 Fix:
 Switched to table-based interface with filtering.
+
+## Import Report Page
+
+Prompt:
+Build import report page.
+
+Issue:
+AI generated a single huge report component.
+
+How I Found It:
+Difficult to maintain and extend.
+
+Fix:
+Split report into focused reusable components.

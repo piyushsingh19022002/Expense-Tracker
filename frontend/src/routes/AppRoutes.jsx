@@ -8,6 +8,7 @@ import ExpensesPage from '../pages/ExpensesPage.jsx';
 import GroupsPage from '../pages/GroupsPage.jsx';
 import ImportPage from '../pages/ImportPage.jsx';
 import AnomalyDashboard from '../pages/AnomalyDashboard.jsx';
+import ImportReportPage from '../pages/ImportReportPage.jsx';
 import LoginPage from '../pages/LoginPage.jsx';
 import RegisterPage from '../pages/RegisterPage.jsx';
 import NotFound from '../pages/NotFound/NotFound.jsx';
@@ -32,6 +33,7 @@ const AppRoutes = () => {
             <Route path={PATHS.GROUPS} element={<GroupsPage />} />
             <Route path={PATHS.IMPORTS} element={<ImportPage />} />
             <Route path={PATHS.ANOMALY_REVIEW} element={<AnomalyDashboard />} />
+            <Route path={PATHS.IMPORT_REPORT} element={<ImportReportPage />} />
           </Route>
         </Route>
 
