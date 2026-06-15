@@ -1,12 +1,17 @@
 import axios from 'axios';
 
-// Determine the base API URL dynamically, ensuring the /v1 routing prefix is appended
+// Determine the base API URL dynamically, ensuring the /api/v1 routing prefix is appended
 const getBaseURL = () => {
   const envUrl = import.meta.env.VITE_API_URL;
   if (!envUrl) {
     return 'http://localhost:8000/api/v1';
   }
-  return envUrl.endsWith('/v1') ? envUrl : `${envUrl}/v1`;
+  // Strip trailing slashes safely
+  const cleanUrl = envUrl.replace(/\/+$/, '');
+  
+  // Guarantee both /api and /v1 segments are present in correct ordering
+  const withApi = cleanUrl.includes('/api') ? cleanUrl : `${cleanUrl}/api`;
+  return withApi.endsWith('/v1') ? withApi : `${withApi}/v1`;
 };
 
 // Initialize Axios client
