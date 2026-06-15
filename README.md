@@ -133,10 +133,41 @@ Implemented:
 - Edit Workflow
 - Review History
 
-Implemented:
-
 - Import Report Page
 - Search Functionality
 - JSON Export
 - CSV Export
 - Report Summary
+
+---
+
+## Production Deployment
+
+This project is configured for production deployment:
+* **Backend**: Deployed on [Render](https://render.com) (Web Service).
+* **Frontend**: Deployed on [Vercel](https://vercel.com) (Single Page App).
+
+### Production Setup & Deployment Steps
+
+#### Backend (Render)
+1. Register/Login to Render and create a new **Web Service**.
+2. Connect your Git repository.
+3. Configure the following environment variables in the Render Dashboard:
+   - `DATABASE_URL`: Your production PostgreSQL connection string.
+   - `JWT_SECRET`: A secure secret string for JWT signing.
+   - `JWT_EXPIRY`: Lifespan of session tokens (e.g. `24h`).
+   - `JWT_COOKIE_NAME`: Session cookie name (default `auth_token`).
+   - `NODE_ENV`: Set to `production`.
+   - `CORS_ORIGIN`: Set to your Vercel URL (e.g., `https://expense-tracker.vercel.app`) or `*`.
+4. Set **Build Command** to `npm install` and **Start Command** to `npm start`.
+5. Deploy the service and verify it is running via `GET /api/health`.
+
+#### Frontend (Vercel)
+1. Register/Login to Vercel and import your repository.
+2. Edit project settings:
+   - **Root Directory**: `frontend`
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+3. Add the following environment variable:
+   - `VITE_API_URL`: Set to your deployed backend URL, e.g., `https://expense-tracker-m6o9.onrender.com/api/v1`.
+4. Trigger the deployment. Vercel automatically reads [vercel.json](file:///Users/piyushsengar/Desktop/Expense%20Tracker/frontend/vercel.json) to handle SPA routing redirects.

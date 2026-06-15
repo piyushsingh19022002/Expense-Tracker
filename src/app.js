@@ -11,9 +11,21 @@ import ApiError from './utils/ApiError.js';
 const app = express();
 
 // 1. Configure CORS
-// Allows configure via comma-separated list of origins or wildcard
+// Support credentials matching by dynamically reflecting requesting origin
 const corsOptions = {
-  origin: config.corsOrigin === '*' ? '*' : config.corsOrigin.split(','),
+  origin: (origin, callback) => {
+    // If CORS_ORIGIN is '*' allow any requesting origin dynamically (required by credentials mode)
+    if (config.corsOrigin === '*') {
+      callback(null, true);
+    } else {
+      const allowedOrigins = config.corsOrigin.split(',').map(o => o.trim());
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('CORS Policy: Request origin not allowed.'));
+      }
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
@@ -29,7 +41,15 @@ app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ extended: true, limit: '16kb' }));
 app.use(cookieParser());
 
-// 4. API Routes Mounting
+// 4. API Health Check Endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "API Running"
+  });
+});
+
+// 5. API Routes Mounting
 app.use('/api/v1', rootRouter);
 
 // 5. 404 Routing Fallback Handler

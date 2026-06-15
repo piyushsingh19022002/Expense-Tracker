@@ -7,7 +7,7 @@ import config from '../config/index.js';
 const getCookieOptions = () => ({
   httpOnly: true,
   secure: config.isProduction, // Enforces secure cookie transport only over HTTPS in production
-  sameSite: 'lax',            // Balance between security and standard cross-site redirection usability
+  sameSite: config.isProduction ? 'none' : 'lax', // Enforce cross-domain session sharing in production
   maxAge: 24 * 60 * 60 * 1000 // 1 day in milliseconds (matching 24h JWT lifetime)
 });
 
@@ -49,7 +49,7 @@ export const logoutUser = asyncHandler(async (req, res) => {
   res.clearCookie(config.jwtCookieName, {
     httpOnly: true,
     secure: config.isProduction,
-    sameSite: 'lax'
+    sameSite: config.isProduction ? 'none' : 'lax'
   });
 
   return res
