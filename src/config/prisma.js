@@ -5,16 +5,28 @@ import config from './index.js';
 
 const { Pool } = pg;
 
-// Initialize PostgreSQL connection pool using connection string
-const pool = new Pool({ 
-  connectionString: config.databaseUrl,
-  max: 10,                 // Limit pool to max 10 connections
-  idleTimeoutMillis: 30000 // Close idle connections after 30s
-});
+let prisma;
 
-const adapter = new PrismaPg(pool);
-
-// Initialize PrismaClient with pg adapter
-const prisma = new PrismaClient({ adapter });
+if (config.isProduction) {
+  const pool = new Pool({ 
+    connectionString: config.databaseUrl,
+    max: 10,                 // Limit pool to max 10 connections
+    idleTimeoutMillis: 30000 // Close idle connections after 30s
+  });
+  const adapter = new PrismaPg(pool);
+  prisma = new PrismaClient({ adapter });
+} else {
+  // In development, preserve client across hot reloads
+  if (!global.prisma) {
+    const pool = new Pool({ 
+      connectionString: config.databaseUrl,
+      max: 10,
+      idleTimeoutMillis: 30000
+    });
+    const adapter = new PrismaPg(pool);
+    global.prisma = new PrismaClient({ adapter });
+  }
+  prisma = global.prisma;
+}
 
 export default prisma;

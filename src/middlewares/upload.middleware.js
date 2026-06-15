@@ -1,9 +1,10 @@
 import path from 'path';
 import multer from 'multer';
+import config from '../config/index.js';
 import ApiError from '../utils/ApiError.js';
 
 export const CSV_UPLOAD_FIELD_NAME = 'file';
-export const CSV_MAX_FILE_SIZE_BYTES = Number(process.env.CSV_IMPORT_MAX_FILE_SIZE_BYTES || 5 * 1024 * 1024);
+export const CSV_MAX_FILE_SIZE_BYTES = config.csvImportMaxFileSizeBytes;
 
 const CSV_MIME_TYPES = new Set([
   'text/csv',

@@ -11,9 +11,29 @@ const errorMiddleware = (err, req, res, next) => {
 
   // Convert generic errors to ApiError if they aren't already instance of it
   if (!(error instanceof ApiError)) {
-    const statusCode = error.statusCode || 500;
-    const message = error.message || 'Internal Server Error';
+    let statusCode = error.statusCode || 500;
+    let message = error.message || 'Internal Server Error';
+
+    // In production, obfuscate database/Prisma errors and unhandled 500 details
+    if (config.isProduction) {
+      const isPrismaOrDb = 
+        error.name?.startsWith('Prisma') || 
+        error.code?.startsWith('P') || 
+        error.message?.toLowerCase().includes('prisma') ||
+        error.message?.toLowerCase().includes('postgres');
+        
+      if (isPrismaOrDb) {
+        statusCode = 500;
+        message = 'A database error occurred. Please try again later.';
+      } else if (statusCode === 500) {
+        message = 'An unexpected server error occurred.';
+      }
+    }
+
     error = new ApiError(statusCode, message, error.errors || [], err.stack);
+  } else if (config.isProduction && error.statusCode === 500) {
+    // Obfuscate message details of internal ApiErrors in production
+    error = new ApiError(500, 'An unexpected server error occurred.', [], error.stack);
   }
 
   // Create standard response layout

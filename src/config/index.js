@@ -37,6 +37,12 @@ if (!databaseUrl) {
   throw new Error('Configuration Error: DATABASE_URL environment variable is required.');
 }
 
+// Parse and default CSV Max File Size
+const csvImportMaxFileSizeBytes = parseInt(process.env.CSV_IMPORT_MAX_FILE_SIZE_BYTES || '5242880', 10);
+if (isNaN(csvImportMaxFileSizeBytes) || csvImportMaxFileSizeBytes <= 0) {
+  throw new Error('Configuration Error: CSV_IMPORT_MAX_FILE_SIZE_BYTES must be a valid positive number.');
+}
+
 export const config = Object.freeze({
   port,
   env,
@@ -45,6 +51,7 @@ export const config = Object.freeze({
   jwtSecret: finalJwtSecret,
   jwtExpiry,
   jwtCookieName,
+  csvImportMaxFileSizeBytes,
   isProduction: env === 'production',
   isDevelopment: env === 'development',
   isTest: env === 'test'

@@ -11,26 +11,15 @@ import ApiError from './utils/ApiError.js';
 const app = express();
 
 // 1. Configure CORS
-// Support credentials matching by dynamically reflecting requesting origin
-const corsOptions = {
-  origin: (origin, callback) => {
-    // If CORS_ORIGIN is '*' allow any requesting origin dynamically (required by credentials mode)
-    if (config.corsOrigin === '*') {
-      callback(null, true);
-    } else {
-      const allowedOrigins = config.corsOrigin.split(',').map(o => o.trim());
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('CORS Policy: Request origin not allowed.'));
-      }
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+// Support production-safe credentials-enabled CORS
+app.use(cors({
+  origin: config.corsOrigin === '*'
+    ? true
+    : config.corsOrigin.split(',').map(o => o.trim()),
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
-};
-app.use(cors(corsOptions));
+}));
 
 // 2. Request Logging via Morgan streaming to Winston logger
 const morganFormat = config.isProduction ? 'combined' : 'dev';
@@ -41,7 +30,15 @@ app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ extended: true, limit: '16kb' }));
 app.use(cookieParser());
 
-// 4. API Health Check Endpoint
+// 4. API Root & Health Check Endpoints
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    service: "Expense Tracker API",
+    status: "running"
+  });
+});
+
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     success: true,
