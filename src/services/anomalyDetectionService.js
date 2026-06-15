@@ -1,5 +1,6 @@
 import prisma from '../config/prisma.js';
 import ApiError from '../utils/ApiError.js';
+import { buildLookupContext } from './memberLookupService.js';
 
 // Configuration keys for column matching alternatives
 const HEADERS = {
@@ -122,83 +123,8 @@ export const detectAndStoreAnomalies = async (importBatchId) => {
   const rows = batch.rows;
   const anomaliesToCreate = [];
 
-  // 1. Gather all unique user emails and names to query system-wide users
-  const uniqueEmails = new Set();
-  const uniqueNames = new Set();
-
-  rows.forEach(({ data }) => {
-    const payerVal = findHeaderValue(data, HEADERS.PAYER).value;
-    const participantsVal = findHeaderValue(data, HEADERS.PARTICIPANTS).value;
-
-    if (payerVal) {
-      const pStr = String(payerVal).trim();
-      if (pStr.includes('@')) uniqueEmails.add(pStr.toLowerCase());
-      else uniqueNames.add(pStr.toLowerCase());
-    }
-
-    parseParticipants(participantsVal).forEach(part => {
-      if (part.includes('@')) uniqueEmails.add(part.toLowerCase());
-      else uniqueNames.add(part.toLowerCase());
-    });
-  });
-
-  // 2. Pre-fetch system-wide users
-  const allMatchingUsers = await prisma.user.findMany({
-    where: {
-      OR: [
-        { email: { in: Array.from(uniqueEmails), mode: 'insensitive' } },
-        { name: { in: Array.from(uniqueNames), mode: 'insensitive' } }
-      ]
-    }
-  });
-
-  // 3. Pre-fetch group memberships (both ACTIVE and LEFT) if group context is available
-  let memberships = [];
-  if (groupId) {
-    memberships = await prisma.membership.findMany({
-      where: { groupId },
-      include: { user: true }
-    });
-  }
-
-  // Helper function to resolve email/name to user ID and group membership status
-  const resolveUser = (identifier) => {
-    if (!identifier) return null;
-    const idClean = String(identifier).trim().toLowerCase();
-    const isEmail = idClean.includes('@');
-
-    // Attempt to match within the group's memberships first
-    const groupMem = memberships.find(m => {
-      return isEmail
-        ? m.user.email.toLowerCase() === idClean
-        : m.user.name.toLowerCase() === idClean;
-    });
-
-    if (groupMem) {
-      return {
-        user: groupMem.user,
-        isMember: true,
-        membershipStatus: groupMem.status // ACTIVE or LEFT
-      };
-    }
-
-    // Attempt to match system-wide user
-    const systemUser = allMatchingUsers.find(u => {
-      return isEmail
-        ? u.email.toLowerCase() === idClean
-        : u.name.toLowerCase() === idClean;
-    });
-
-    if (systemUser) {
-      return {
-        user: systemUser,
-        isMember: false,
-        membershipStatus: null
-      };
-    }
-
-    return null; // Totally unknown user
-  };
+  // 1. Build lookup context
+  const { resolveUser } = await buildLookupContext(groupId, rows);
 
   // 4. Pre-fetch existing group expenses to optimize database duplicate checking
   const uniqueDates = [];
