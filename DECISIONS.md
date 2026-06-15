@@ -123,3 +123,14 @@ Recalculate anomalies during report generation.
 
 Reason:
 Avoid duplicate business logic and ensure consistency.
+
+# Decision 12
+
+Decision:
+Store corrections separately.
+
+Alternative:
+Overwrite imported values.
+
+Reason:
+Maintain complete audit trail.

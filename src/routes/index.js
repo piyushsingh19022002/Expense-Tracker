@@ -7,6 +7,7 @@ import expenseRouter from './expense.routes.js';
 import settlementRouter from './settlement.routes.js';
 import balanceRouter from './balance.routes.js';
 import importRouter from './import.routes.js';
+import anomalyReviewRouter from './anomalyReview.routes.js';
 
 const router = Router();
 
@@ -19,6 +20,7 @@ router.use('/', expenseRouter);
 router.use('/', settlementRouter);
 router.use('/groups', balanceRouter);
 router.use('/imports', importRouter);
+router.use('/anomalies', anomalyReviewRouter);
 
 // Extend here as new feature routes are developed:
 // router.use('/expenses', expenseRouter);

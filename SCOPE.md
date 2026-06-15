@@ -14,3 +14,13 @@ Every row retains original row number for anomaly tracking.
 - Unknown Member
 - Former Member
 - Settlement Logged As Expense
+
+## Review Workflow
+
+Users can:
+
+- Approve anomalies
+- Reject anomalies
+- Edit imported values
+
+All actions preserve audit history.

@@ -207,3 +207,17 @@ Duplicate logic existed in report service.
 
 Fix:
 Report service only reads ImportBatch and ImportAnomaly data.
+
+## Import Review Workflow
+
+Prompt:
+Implement anomaly review workflow.
+
+Issue:
+AI suggested directly updating imported rows.
+
+How I Found It:
+Original imported values were lost.
+
+Fix:
+Introduced RowCorrection table and audit trail.
