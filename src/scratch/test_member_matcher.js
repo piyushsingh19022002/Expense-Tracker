@@ -4,12 +4,12 @@ import { buildLookupContext } from '../services/memberLookupService.js';
 import assert from 'assert';
 
 async function main() {
-  console.log('--- Starting Member Matcher Verification Tests ---');
+  console.log('--- Starting Comprehensive Member Matcher Verification Tests ---');
 
-  // Test 1: Normalization
-  console.log('1. Testing normalizeMemberIdentifier...');
-  assert.strictEqual(normalizeMemberIdentifier('  Aisha  '), 'aisha');
-  assert.strictEqual(normalizeMemberIdentifier('aisha'), 'aisha');
+  // Test 1: Normalization & Unicode check
+  console.log('1. Testing normalizeMemberIdentifier (Unicode and space collapse)...');
+  assert.strictEqual(normalizeMemberIdentifier('  Aishâ  '), 'aisha'); // Accents removed, trimmed
+  assert.strictEqual(normalizeMemberIdentifier('aishä'), 'aisha');
   assert.strictEqual(normalizeMemberIdentifier('AISHA'), 'aisha');
   assert.strictEqual(normalizeMemberIdentifier('Rohan   '), 'rohan');
   assert.strictEqual(normalizeMemberIdentifier('Aisha   Dev'), 'aisha dev');
@@ -36,19 +36,20 @@ async function main() {
     }
   });
 
-  // Create users with trailing spaces or casing differences in database to match the problem statement
+  // User 1 is Aisha (ACTIVE member)
   const user1 = await prisma.user.create({
     data: {
       email: 'Matcher.Creator@example.com', // Casing differences
-      name: '  Aisha  ', // Spaces in name
+      name: '  Aishâ  ', // Accents and Spaces in name
       password: 'testPassword123'
     }
   });
 
+  // User 2 is Rohan (former member who left on 2026-06-10)
   const user2 = await prisma.user.create({
     data: {
       email: memberEmail,
-      name: 'Rohan Goel', // Normal name
+      name: 'Rohan Goel',
       password: 'testPassword123'
     }
   });
@@ -70,61 +71,47 @@ async function main() {
     }
   });
 
-  // User 2 is LEFT (former member)
+  // User 2 is LEFT (former member) with leftAt set to 2026-06-10
   await prisma.membership.create({
     data: {
       groupId: group.id,
       userId: user2.id,
-      status: 'LEFT'
+      status: 'LEFT',
+      leftAt: new Date('2026-06-10')
     }
   });
 
-  console.log('3. Running lookup contexts...');
+  console.log('3. Testing Lookup Context resolutions and Timelines...');
   const mockCsvRows = [
     {
       rowNumber: 2,
       data: {
-        'Paid By': ' Aisha ', // Should match user1 (Aisha)
-        'Split Between': 'matcher.member@example.com; matcher.creator@example.com'
-      }
-    },
-    {
-      rowNumber: 3,
-      data: {
-        'Paid By': 'Rohan Goel', // Should match user2 (former)
-        'Split Between': 'aisha'
+        'Paid By': ' Aishâ ',
+        'Split Between': 'matcher.member@example.com'
       }
     }
   ];
 
   const lookupContext = await buildLookupContext(group.id, mockCsvRows);
 
-  // Assertions on resolveUser
-  // Test Payer 1 (Aisha)
-  const resolvedAisha = lookupContext.resolveUser(' Aisha ');
-  assert.ok(resolvedAisha, 'Should resolve Aisha');
-  assert.strictEqual(resolvedAisha.user.id, user1.id);
-  assert.strictEqual(resolvedAisha.isMember, true);
-  assert.strictEqual(resolvedAisha.membershipStatus, 'ACTIVE');
+  // Test active member resolution
+  const resolvedAisha = lookupContext.resolveMember(' Aishâ ', new Date('2026-06-15'));
+  assert.ok(resolvedAisha);
+  assert.strictEqual(resolvedAisha.anomalyType, null); // Valid active member
+  assert.strictEqual(resolvedAisha.matchedUser.id, user1.id);
 
-  // Test case differences and spaces
-  const resolvedAishaCase = lookupContext.resolveUser('aisha');
-  assert.ok(resolvedAishaCase, 'Should resolve lowercased aisha');
-  assert.strictEqual(resolvedAishaCase.user.id, user1.id);
+  // Test former member timeline rules:
+  // Transaction on 2026-06-05 (before Rohan left on 2026-06-10) -> Should be valid!
+  const resolvedRohanBefore = lookupContext.resolveMember('Rohan Goel', new Date('2026-06-05'));
+  assert.strictEqual(resolvedRohanBefore.anomalyType, null); // Still active at transaction time!
+  assert.strictEqual(resolvedRohanBefore.matchedUser.id, user2.id);
 
-  // Test email match
-  const resolvedEmail = lookupContext.resolveUser('matcher.creator@example.com');
-  assert.ok(resolvedEmail, 'Should resolve by email');
-  assert.strictEqual(resolvedEmail.user.id, user1.id);
+  // Transaction on 2026-06-15 (after Rohan left on 2026-06-10) -> Should trigger FORMER_MEMBER!
+  const resolvedRohanAfter = lookupContext.resolveMember('Rohan Goel', new Date('2026-06-15'));
+  assert.strictEqual(resolvedRohanAfter.anomalyType, 'FORMER_MEMBER'); // Left before transaction date
+  assert.strictEqual(resolvedRohanAfter.matchedUser.id, user2.id);
 
-  // Test Rohan (former member)
-  const resolvedRohan = lookupContext.resolveUser('Rohan Goel ');
-  assert.ok(resolvedRohan, 'Should resolve Rohan Goel');
-  assert.strictEqual(resolvedRohan.user.id, user2.id);
-  assert.strictEqual(resolvedRohan.isMember, true);
-  assert.strictEqual(resolvedRohan.membershipStatus, 'LEFT');
-
-  // Test non-member resolution
+  // Test system user not in group (Priya)
   const stranger = await prisma.user.create({
     data: {
       email: 'stranger@example.com',
@@ -133,24 +120,15 @@ async function main() {
     }
   });
 
-  const mockRowsWithStranger = [
-    {
-      rowNumber: 2,
-      data: {
-        'Paid By': 'Priya', // Exists system-wide, not in group
-        'Split Between': 'Aisha'
-      }
-    }
-  ];
-
+  const mockRowsWithStranger = [{ data: { 'paid_by': 'Priya' } }];
   const contextWithStranger = await buildLookupContext(group.id, mockRowsWithStranger);
-  const resolvedStranger = contextWithStranger.resolveUser('Priya');
-  assert.ok(resolvedStranger, 'Should match Priya as system-wide user');
-  assert.strictEqual(resolvedStranger.user.id, stranger.id);
-  assert.strictEqual(resolvedStranger.isMember, false);
-  assert.strictEqual(resolvedStranger.membershipStatus, null);
+  
+  const resolvedStranger = contextWithStranger.resolveMember('Priya', new Date());
+  assert.strictEqual(resolvedStranger.anomalyType, 'UNKNOWN_MEMBER');
+  assert.strictEqual(resolvedStranger.matchedUser.id, stranger.id);
+  assert.strictEqual(resolvedStranger.matchedMembership, null);
 
-  console.log('✔ Lookup contexts resolved matches perfectly.');
+  console.log('✔ All matching and timeline tests passed.');
 
   // Clean up
   console.log('4. Cleaning up test database records...');

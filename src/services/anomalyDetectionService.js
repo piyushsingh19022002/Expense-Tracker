@@ -124,7 +124,7 @@ export const detectAndStoreAnomalies = async (importBatchId) => {
   const anomaliesToCreate = [];
 
   // 1. Build lookup context
-  const { resolveUser } = await buildLookupContext(groupId, rows);
+  const { resolveMember } = await buildLookupContext(groupId, rows);
 
   // 4. Pre-fetch existing group expenses to optimize database duplicate checking
   const uniqueDates = [];
@@ -163,10 +163,10 @@ export const detectAndStoreAnomalies = async (importBatchId) => {
     const descNorm = normalizeDescription(descVal);
     const dateNorm = toISODate(dateVal);
     const amtParsed = parseFloat(amountVal);
-    const payerUser = resolveUser(payerVal);
+    const payerResolved = resolveMember(payerVal, dateNorm);
 
-    if (descNorm && dateNorm && !isNaN(amtParsed) && payerUser) {
-      const sig = `${descNorm}|${dateNorm}|${amtParsed.toFixed(2)}|${payerUser.user.id}`;
+    if (descNorm && dateNorm && !isNaN(amtParsed) && payerResolved && payerResolved.matchedUser) {
+      const sig = `${descNorm}|${dateNorm}|${amtParsed.toFixed(2)}|${payerResolved.matchedUser.id}`;
       if (!batchSignatures[sig]) {
         batchSignatures[sig] = [];
       }
@@ -190,12 +190,12 @@ export const detectAndStoreAnomalies = async (importBatchId) => {
     const descNorm = normalizeDescription(descVal);
     const dateNorm = toISODate(dateVal);
     const amtParsed = parseFloat(amountVal);
-    const payerUser = resolveUser(payerVal);
+    const payerResolved = resolveMember(payerVal, dateNorm);
 
     let isDuplicate = false;
 
-    if (descNorm && dateNorm && !isNaN(amtParsed) && payerUser) {
-      const sig = `${descNorm}|${dateNorm}|${amtParsed.toFixed(2)}|${payerUser.user.id}`;
+    if (descNorm && dateNorm && !isNaN(amtParsed) && payerResolved && payerResolved.matchedUser) {
+      const sig = `${descNorm}|${dateNorm}|${amtParsed.toFixed(2)}|${payerResolved.matchedUser.id}`;
       
       // Check duplicate within the batch
       if (batchSignatures[sig] && batchSignatures[sig].length > 1) {
@@ -222,7 +222,7 @@ export const detectAndStoreAnomalies = async (importBatchId) => {
             normalizeDescription(exp.description) === descNorm &&
             expDateStr === dateNorm &&
             parseFloat(exp.amount) === amtParsed &&
-            exp.paidById === payerUser.user.id
+            exp.paidById === payerResolved.matchedUser.id
           );
         });
 
@@ -317,35 +317,17 @@ export const detectAndStoreAnomalies = async (importBatchId) => {
         rawContent: rowData
       });
     } else {
-      const payerResolved = resolveUser(payerVal);
-      if (!payerResolved) {
+      const payerResult = resolveMember(payerVal, dateNorm);
+      if (payerResult.anomalyType) {
         anomaliesToCreate.push({
           importBatchId,
           rowNumber: rowNum,
-          anomalyType: 'UNKNOWN_MEMBER',
-          severity: 'CRITICAL',
-          description: `The payer "${payerVal}" is not registered in the system or part of this group.`,
-          suggestedAction: 'Invite the user to the app and add them to the group, or correct the payer name/email.',
-          rawContent: rowData
-        });
-      } else if (!payerResolved.isMember) {
-        anomaliesToCreate.push({
-          importBatchId,
-          rowNumber: rowNum,
-          anomalyType: 'UNKNOWN_MEMBER',
-          severity: 'CRITICAL',
-          description: `The payer "${payerVal}" is a registered system user, but is not a member of this group.`,
-          suggestedAction: 'Add the user as a member of this group to authorize their payments.',
-          rawContent: rowData
-        });
-      } else if (payerResolved.membershipStatus === 'LEFT') {
-        anomaliesToCreate.push({
-          importBatchId,
-          rowNumber: rowNum,
-          anomalyType: 'FORMER_MEMBER',
-          severity: 'HIGH',
-          description: `The payer "${payerVal}" is a former member of this group (status: LEFT).`,
-          suggestedAction: 'Re-activate membership if the member has rejoined, or change the designated payer.',
+          anomalyType: payerResult.anomalyType,
+          severity: payerResult.anomalyType === 'UNKNOWN_MEMBER' ? 'CRITICAL' : 'HIGH',
+          description: payerResult.rootCause,
+          suggestedAction: payerResult.anomalyType === 'UNKNOWN_MEMBER'
+            ? 'Invite the user to the app and add them to the group, or correct the payer name/email.'
+            : 'Re-activate membership if the member has rejoined, or change the designated payer.',
           rawContent: rowData
         });
       }
@@ -354,35 +336,17 @@ export const detectAndStoreAnomalies = async (importBatchId) => {
     // --- ANOMALY 6 & 7: Unknown and Former Members (Participants split check) ---
     const participantsList = parseParticipants(participantsVal);
     participantsList.forEach(participant => {
-      const partResolved = resolveUser(participant);
-      if (!partResolved) {
+      const partResult = resolveMember(participant, dateNorm);
+      if (partResult.anomalyType) {
         anomaliesToCreate.push({
           importBatchId,
           rowNumber: rowNum,
-          anomalyType: 'UNKNOWN_MEMBER',
-          severity: 'CRITICAL',
-          description: `Split participant "${participant}" is not registered in the system or part of this group.`,
-          suggestedAction: 'Invite the user to the app and add them to the group, or correct their details.',
-          rawContent: rowData
-        });
-      } else if (!partResolved.isMember) {
-        anomaliesToCreate.push({
-          importBatchId,
-          rowNumber: rowNum,
-          anomalyType: 'UNKNOWN_MEMBER',
-          severity: 'CRITICAL',
-          description: `Split participant "${participant}" is a registered user, but is not a member of this group.`,
-          suggestedAction: 'Add the user to the group to include them in the expense splits.',
-          rawContent: rowData
-        });
-      } else if (partResolved.membershipStatus === 'LEFT') {
-        anomaliesToCreate.push({
-          importBatchId,
-          rowNumber: rowNum,
-          anomalyType: 'FORMER_MEMBER',
-          severity: 'HIGH',
-          description: `Split participant "${participant}" is a former member of this group (status: LEFT).`,
-          suggestedAction: 'Confirm if this historical split is valid, or remove them from participant list.',
+          anomalyType: partResult.anomalyType,
+          severity: partResult.anomalyType === 'UNKNOWN_MEMBER' ? 'CRITICAL' : 'HIGH',
+          description: partResult.rootCause,
+          suggestedAction: partResult.anomalyType === 'UNKNOWN_MEMBER'
+            ? 'Invite the user to the app and add them to the group, or correct their details.'
+            : 'Confirm if this historical split is valid, or remove them from participant list.',
           rawContent: rowData
         });
       }

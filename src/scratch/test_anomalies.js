@@ -45,7 +45,11 @@ async function setupTestData() {
 
   // 4. Soft-delete the former member so status becomes LEFT
   await groupService.removeMember(group.id, former.id, creator.id);
-  console.log('Added members and soft-deleted former.member@example.com (status: LEFT).');
+  await prisma.membership.update({
+    where: { groupId_userId: { groupId: group.id, userId: former.id } },
+    data: { leftAt: new Date('2026-06-01') }
+  });
+  console.log('Added members and soft-deleted former.member@example.com (status: LEFT, leftAt: 2026-06-01).');
 
   // 5. Pre-seed a historical expense to test database duplicate matching
   // Row 1 matches: Team Pizza, 2026-06-10, 50.00 USD, paid by active member
