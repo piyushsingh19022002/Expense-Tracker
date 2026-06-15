@@ -1,0 +1,5 @@
+Description,Date,Amount,Currency,Paid By,Split Between
+Healthy Lunch,2026-06-14,24.50,USD,reviewer@example.com,reviewer@example.com
+Office Coffee,Invalid Date String,15.00,USD,reviewer@example.com,reviewer@example.com
+Refund for Uber,2026-06-15,-30.00,USD,reviewer@example.com,reviewer@example.com
+repayment payback of balance,2026-06-16,45.00,USD,reviewer@example.com,reviewer@example.com

@@ -7,6 +7,7 @@ export const PATHS = {
   EXPENSES: '/expenses',
   GROUPS: '/groups',
   IMPORTS: '/imports',
+  ANOMALY_REVIEW: '/imports/:batchId/anomalies',
   LOGIN: '/login',
   REGISTER: '/register',
   NOT_FOUND: '*'

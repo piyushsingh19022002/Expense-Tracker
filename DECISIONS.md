@@ -134,3 +134,14 @@ Overwrite imported values.
 
 Reason:
 Maintain complete audit trail.
+
+# Decision 13
+
+Decision:
+Use table-based review dashboard.
+
+Alternative:
+Card-based review UI.
+
+Reason:
+Review workflows are data-intensive and benefit from tabular display.

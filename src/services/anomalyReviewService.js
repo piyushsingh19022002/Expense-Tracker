@@ -130,8 +130,28 @@ export const editAnomalyRow = async (id, newCorrectedData, userId) => {
   });
 };
 
+/**
+ * @description Retrieves anomalies with optional filtering by batchId, status, severity, and anomalyType.
+ * 
+ * @param {Object} filters - Query filters
+ * @returns {Promise<Array>} List of anomalies
+ */
+export const getAnomalies = async ({ batchId, status, severity, type }) => {
+  const where = {};
+  if (batchId) where.importBatchId = batchId;
+  if (status) where.status = status;
+  if (severity) where.severity = severity;
+  if (type) where.anomalyType = type;
+
+  return prisma.importAnomaly.findMany({
+    where,
+    orderBy: [{ rowNumber: 'asc' }, { createdAt: 'desc' }]
+  });
+};
+
 export default {
   approveAnomaly,
   rejectAnomaly,
-  editAnomalyRow
+  editAnomalyRow,
+  getAnomalies
 };

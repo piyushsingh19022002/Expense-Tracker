@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import PATHS from '../../routes/paths.js';
-import { FileUp, LayoutDashboard, Wallet, Settings, LogOut, Users } from 'lucide-react';
+import { LayoutDashboard, Wallet, Settings, LogOut, Users, FileUp } from 'lucide-react';
 import useAuth from '../../hooks/useAuth.js';
 
 /**

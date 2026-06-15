@@ -44,8 +44,28 @@ export const editAnomaly = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, result, 'Row values successfully corrected and audit trail logged.'));
 });
 
+/**
+ * @description Retrieves a list of anomalies filtered by query parameters.
+ * @route GET /api/v1/anomalies
+ */
+export const getAnomalies = asyncHandler(async (req, res) => {
+  const { batchId, status, severity, type } = req.query;
+
+  const anomalies = await anomalyReviewService.getAnomalies({
+    batchId,
+    status,
+    severity,
+    type
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, anomalies, 'Anomalies retrieved successfully.'));
+});
+
 export default {
   approveAnomaly,
   rejectAnomaly,
-  editAnomaly
+  editAnomaly,
+  getAnomalies
 };

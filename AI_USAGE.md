@@ -221,3 +221,17 @@ Original imported values were lost.
 
 Fix:
 Introduced RowCorrection table and audit trail.
+
+## Anomaly Review UI
+
+Prompt:
+Build anomaly review dashboard.
+
+Issue:
+AI generated card-based anomaly list.
+
+How I Found It:
+Large imports became difficult to review.
+
+Fix:
+Switched to table-based interface with filtering.

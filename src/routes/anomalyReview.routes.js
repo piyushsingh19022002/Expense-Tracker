@@ -7,6 +7,9 @@ const router = Router();
 // Protect review workflow endpoints with authMiddleware
 router.use(authMiddleware);
 
+// GET /anomalies - List anomalies with filters
+router.get('/', anomalyReviewController.getAnomalies);
+
 // POST /anomalies/:id/approve - Approve an anomaly
 router.post('/:id/approve', anomalyReviewController.approveAnomaly);
 
