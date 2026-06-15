@@ -1,8 +1,9 @@
 import prisma from '../config/prisma.js';
 import ApiError from '../utils/ApiError.js';
 import { parseCsvBuffer } from './csvParserService.js';
+import { detectAndStoreAnomalies } from './anomalyDetectionService.js';
 
-export const createCsvImport = async ({ file, uploadedById }) => {
+export const createCsvImport = async ({ file, uploadedById, groupId }) => {
   if (!file) {
     throw new ApiError(400, 'CSV file is required. Upload it using the "file" form field.');
   }
@@ -15,7 +16,8 @@ export const createCsvImport = async ({ file, uploadedById }) => {
         fileName: file.originalname,
         uploadedById,
         totalRows: parsedRows.length,
-        status: 'PARSED'
+        status: 'PARSED',
+        groupId: groupId || null
       }
     });
 
@@ -32,13 +34,18 @@ export const createCsvImport = async ({ file, uploadedById }) => {
     return batch;
   }, { timeout: 15000 });
 
+  // Execute anomaly detection for the batch
+  const anomalies = await detectAndStoreAnomalies(importBatch.id);
+
   return {
     importBatchId: importBatch.id,
     totalRows: importBatch.totalRows,
-    parsedRows
+    parsedRows,
+    anomalies
   };
 };
 
 export default {
   createCsvImport
 };
+

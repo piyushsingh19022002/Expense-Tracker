@@ -180,3 +180,16 @@ Large file uploads gave no user feedback.
 Fix:
 Added Axios upload progress tracking.
 
+## Anomaly Detection
+
+Prompt:
+Implement anomaly detection engine.
+
+Issue:
+AI automatically corrected ambiguous dates.
+
+How I Found It:
+Could silently convert 01/02/2026 into wrong date.
+
+Fix:
+Marked as AMBIGUOUS_DATE anomaly requiring review.

@@ -13,10 +13,28 @@ enum MembershipStatus {
   LEFT
 }
 
-enum AnomalyStatus {
+enum ImportAnomalyStatus {
   PENDING
-  RESOLVED
-  IGNORED
+  APPROVED
+  REJECTED
+}
+
+enum ImportAnomalySeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ImportAnomalyType {
+  DUPLICATE_EXPENSE
+  INVALID_DATE
+  AMBIGUOUS_DATE
+  MISSING_CURRENCY
+  NEGATIVE_AMOUNT
+  UNKNOWN_MEMBER
+  FORMER_MEMBER
+  SETTLEMENT_LOGGED_AS_EXPENSE
 }
 
 enum ImportBatchStatus {
@@ -42,7 +60,6 @@ model User {
   expenseShares     ExpenseParticipant[]
   sentSettlements   Settlement[]         @relation("SettlementsSent")
   rcvdSettlements   Settlement[]         @relation("SettlementsReceived")
-  resolvedAnomalies ImportAnomaly[]      @relation("AnomaliesResolved")
   importBatches     ImportBatch[]        @relation("ImportBatchesUploaded")
 
   @@map("users")
@@ -59,6 +76,7 @@ model Group {
   memberships Membership[]
   expenses    Expense[]
   settlements Settlement[]
+  importBatches ImportBatch[]
 
   @@map("groups")
 }
@@ -139,6 +157,7 @@ model Settlement {
 model ImportBatch {
   id           String            @id @default(uuid())
   fileName     String
+  groupId      String?
   uploadTime   DateTime          @default(now())
   totalRows    Int
   status       ImportBatchStatus @default(PENDING)
@@ -147,9 +166,12 @@ model ImportBatch {
   updatedAt    DateTime          @updatedAt
 
   // Mapped Relations
+  group      Group?       @relation(fields: [groupId], references: [id], onDelete: SetNull)
   uploadedBy User        @relation("ImportBatchesUploaded", fields: [uploadedById], references: [id], onDelete: Restrict)
   rows       ImportRow[]
+  anomalies  ImportAnomaly[]
 
+  @@index([groupId])
   @@index([uploadedById])
   @@index([status])
   @@map("import_batches")
@@ -171,19 +193,23 @@ model ImportRow {
 }
 
 model ImportAnomaly {
-  id              String        @id @default(uuid())
-  fileName        String
-  rawContent      Json // Raw JSON row payload that failed parsing/validation
-  reason          String // Description of validation breakdown
-  status          AnomalyStatus @default(PENDING)
-  resolvedById    String?
-  resolvedAt      DateTime?
-  resolutionNotes String?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id              String                @id @default(uuid())
+  importBatchId   String
+  rowNumber       Int
+  anomalyType     ImportAnomalyType
+  severity        ImportAnomalySeverity
+  description     String
+  suggestedAction String
+  status          ImportAnomalyStatus   @default(PENDING)
+  rawContent      Json
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
 
   // Mapped Relations
-  resolvedBy User? @relation("AnomaliesResolved", fields: [resolvedById], references: [id], onDelete: SetNull)
+  importBatch ImportBatch @relation(fields: [importBatchId], references: [id], onDelete: Cascade)
 
+  @@index([importBatchId])
+  @@index([importBatchId, rowNumber])
+  @@index([status])
   @@map("import_anomalies")
 }
