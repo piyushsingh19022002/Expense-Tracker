@@ -73,16 +73,25 @@ const ImportSummary = ({ importResult }) => {
         </Card>
       ) : (
         <Card className="border-brand-accent/25 bg-brand-accent/5">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-brand-accent/25 bg-brand-accent/10 text-brand-accent">
-              <CheckCircle2 size={19} />
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-brand-accent/25 bg-brand-accent/10 text-brand-accent">
+                <CheckCircle2 size={19} />
+              </div>
+              <div className="space-y-0.5">
+                <h3 className="text-sm font-bold text-white">No Anomalies Found</h3>
+                <p className="text-[11px] text-brand-text-secondary leading-normal">
+                  This CSV is perfectly formatted and contains no duplicates, missing currencies, or former member splits.
+                </p>
+              </div>
             </div>
-            <div className="space-y-0.5">
-              <h3 className="text-sm font-bold text-white">No Anomalies Found</h3>
-              <p className="text-[11px] text-brand-text-secondary leading-normal">
-                This CSV is perfectly formatted and contains no duplicates, missing currencies, or former member splits.
-              </p>
-            </div>
+            <Link
+              to={`/imports/${importResult.importBatchId}/report`}
+              className="flex h-10 items-center justify-center gap-1.5 rounded-lg bg-brand-accent hover:bg-brand-accent-hover text-white px-4 text-xs font-bold transition-all shadow-md shadow-brand-accent/10 cursor-pointer self-start sm:self-auto shrink-0"
+            >
+              <span>View Report</span>
+              <ChevronRight size={14} className="stroke-[2.5]" />
+            </Link>
           </div>
         </Card>
       )}
