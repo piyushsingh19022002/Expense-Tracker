@@ -69,7 +69,7 @@ const RegisterForm = () => {
           <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-brand-text-secondary" />
           <input
             type="text"
-            placeholder="John Doe"
+            placeholder="User Name"
             className={`w-full rounded-lg bg-slate-900/30 border pl-10 pr-4 py-2.5 text-xs text-brand-text-primary placeholder:text-brand-text-secondary focus:outline-none focus:ring-1 transition-all ${
               errors.name
                 ? 'border-brand-danger/55 focus:border-brand-danger/60 focus:ring-brand-danger/50'
