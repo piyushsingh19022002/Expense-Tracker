@@ -1,8 +1,17 @@
 import axios from 'axios';
 
+// Determine the base API URL dynamically, ensuring the /v1 routing prefix is appended
+const getBaseURL = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (!envUrl) {
+    return 'http://localhost:8000/api/v1';
+  }
+  return envUrl.endsWith('/v1') ? envUrl : `${envUrl}/v1`;
+};
+
 // Initialize Axios client
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1',
+  baseURL: getBaseURL(),
   timeout: 10000, // 10s request timeout
   withCredentials: true, // Allow secure cross-domain cookie transmission
   headers: {
