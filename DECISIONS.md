@@ -111,3 +111,15 @@ Process CSV directly without history.
 
 Reason:
 Auditability and import tracking.
+
+
+# Decision 11
+
+Decision:
+Generate import reports from stored anomaly records.
+
+Alternative:
+Recalculate anomalies during report generation.
+
+Reason:
+Avoid duplicate business logic and ensure consistency.

@@ -192,4 +192,18 @@ How I Found It:
 Could silently convert 01/02/2026 into wrong date.
 
 Fix:
-Marked as AMBIGUOUS_DATE anomaly requiring review.
+Marked as AMBIGUOUS_DATE anomaly requiring review 
+
+## Import Report Generation
+
+Prompt:
+Generate import report from anomaly results.
+
+Issue:
+AI attempted to rerun anomaly detection during report generation.
+
+How I Found It:
+Duplicate logic existed in report service.
+
+Fix:
+Report service only reads ImportBatch and ImportAnomaly data.
