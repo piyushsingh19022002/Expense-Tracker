@@ -1,173 +1,313 @@
-# Expense Tracker - Backend Foundation
+# Expense Tracker & CSV Import Review System
 
-A production-grade, highly scalable Node.js backend template using Express, CORS, Morgan, and dotenv.
+## Overview
 
----
+Expense Tracker is a shared expense management application designed to manage groups, expenses, settlements, balances, and CSV-based expense imports.
 
-## Tech Stack
+The application supports anomaly detection and review workflows to ensure imported financial data remains accurate and auditable.
 
-*   **Runtime**: Node.js (with standard ES Modules `"type": "module"`)
-*   **Framework**: Express.js
-*   **Logging**: Winston (structured logging formats) & Morgan (HTTP request logging streaming to Winston)
-*   **Environment**: Dotenv for configuration loading and validation
+This project was developed as part of the Spreetail Software Developer Assignment.
 
 ---
 
-## Getting Started
+# Features
 
-### Prerequisites
+## Authentication
 
-*   Node.js (v18+)
-*   npm (v9+)
+* User Registration
+* User Login
+* JWT Authentication
+* Protected Routes
 
-### Installation
+## Group Management
 
-1.  Install the required dependencies:
-    ```bash
-    npm install
-    ```
+* Create Groups
+* Add Members
+* Remove Members
+* Membership Timeline Tracking
 
-2.  Environment configuration setup:
-    The application reads environment variables from a `.env` file in the root. A template `.env.example` is provided:
-    ```bash
-    cp .env.example .env
-    ```
+## Expense Management
 
-### Execution Scripts
+* Create Expenses
+* Edit Expenses
+* Delete Expenses
+* Participant Management
 
-*   **Development Mode** (re-runs automatically on file changes using `nodemon`):
-    ```bash
-    npm run dev
-    ```
+## Balance Dashboard
 
-*   **Production Mode**:
-    ```bash
-    npm start
-    ```
+* Total Paid
+* Total Owed
+* Net Balance
+* Who Owes Whom View
+
+## Settlements
+
+* Record Settlements
+* Settlement History
+
+## CSV Import System
+
+* CSV Upload
+* Parsed Data Preview
+* Import Summary
+
+## Anomaly Detection
+
+The system detects:
+
+* Duplicate Expense
+* Invalid Date
+* Ambiguous Date
+* Missing Currency
+* Negative Amount
+* Unknown Member
+* Former Member
+* Settlement Recorded As Expense
+
+## Anomaly Review Workflow
+
+* Approve
+* Reject
+* Edit
+* Review History
+
+## Import Reports
+
+* Import Summary
+* Search
+* CSV Export
+* JSON Export
 
 ---
 
-## Project Directory Layout
+# Tech Stack
 
-```text
-├── src/
-│   ├── config/             # Validation & loading of environment configuration
-│   ├── constants/          # Static domain, HTTP, and system constants
-│   ├── controllers/        # Handles incoming requests, formatting outgoing responses
-│   ├── middlewares/        # Express custom middlewares (security, logging, validation, error handler)
-│   ├── routes/             # App routing and endpoint routing declarations
-│   ├── services/           # Reusable business logic layers
-│   ├── utils/              # Helper utilities (ApiError, ApiResponse, asyncHandler, logger)
-│   ├── app.js              # Express app setup and middleware registration
-│   └── server.js           # HTTP server bootstrapping and process listeners
+## Frontend
+
+* React
+* Vite
+* Tailwind CSS
+* React Router
+* Axios
+
+## Backend
+
+* Node.js
+* Express.js
+* JWT Authentication
+* Multer
+
+## Database
+
+* PostgreSQL
+* Prisma ORM
+
+## Deployment
+
+* Frontend: Vercel
+* Backend: Render
+* Database: Neon PostgreSQL
+
+---
+
+# Setup Instructions
+
+## Clone Repository
+
+```bash
+git clone <repository-url>
+cd expense-tracker
+```
+
+## Install Backend Dependencies
+
+```bash
+npm install
+```
+
+## Install Frontend Dependencies
+
+```bash
+cd frontend
+npm install
 ```
 
 ---
 
-## Standardized API Endpoints
+# Environment Variables
 
-### Health Check
+## Backend (.env)
 
-*   **Endpoint**: `/api/v1/health`
-*   **Method**: `GET`
-*   **Description**: Verifies if the backend server is running healthily.
-*   **Response Code**: `200 OK`
-*   **Response Shape**:
-    ```json
-    {
-      "success": true,
-      "statusCode": 200,
-      "message": "Server is running healthily.",
-      "data": {
-        "status": "UP",
-        "uptime": 12,
-        "timestamp": "2026-06-14T23:55:00.000Z"
-      }
-    }
-    ```
+```env
+DATABASE_URL=
+JWT_SECRET=
+JWT_EXPIRY=24h
+JWT_COOKIE_NAME=auth_token
+NODE_ENV=development
+CORS_ORIGIN=*
+CSV_IMPORT_MAX_FILE_SIZE_BYTES=5242880
+```
 
-### Error Handling
+## Frontend (.env)
 
-All failed operations (e.g. database failures, validation errors) return standardized error formats:
+```env
+VITE_API_URL=http://localhost:8000/api/v1
+```
+
+---
+
+# Running The Application
+
+## Backend
+
+```bash
+npm run dev
+```
+
+Backend starts on:
+
+```text
+http://localhost:8000
+```
+
+## Frontend
+
+```bash
+cd frontend
+npm run dev
+```
+
+Frontend starts on:
+
+```text
+http://localhost:5173
+```
+
+---
+
+# API Health Check
+
+```http
+GET /api/v1/health
+```
+
+Example Response:
+
 ```json
 {
-  "success": false,
-  "message": "API resource not found: GET /api/v1/invalid-route",
-  "errors": [],
-  "stack": "ApiError: API resource not found... (only visible in development mode)"
+  "success": true,
+  "statusCode": 200,
+  "message": "Server is running healthily."
 }
 ```
 
-Implemented:
+---
 
-- Group Management
-- Member Management
-- Membership Timeline Support
+# Project Structure
 
-Implemented:
-
-- Expense Management
-- Expense CRUD
-- Participant Selection
-
-Implemented:
-
-- Balance Dashboard
-- User Balance Summary
-- Settlement History
-- Who Owes Whom View
-
-Implemented:
-
-- CSV Upload UI
-- Upload Progress
-- Parsed Data Preview
-- Import Summary
-
-Implemented:
-
-- Anomaly Review Dashboard
-- Filtering
-- Approval Workflow
-- Rejection Workflow
-- Edit Workflow
-- Review History
-
-- Import Report Page
-- Search Functionality
-- JSON Export
-- CSV Export
-- Report Summary
+```text
+root
+│
+├── frontend
+│
+├── prisma
+│
+├── src
+│   ├── config
+│   ├── constants
+│   ├── controllers
+│   ├── middlewares
+│   ├── routes
+│   ├── services
+│   ├── utils
+│   ├── app.js
+│   └── server.js
+│
+├── README.md
+├── SCOPE.md
+├── DECISIONS.md
+├── AI_USAGE.md
+```
 
 ---
 
-## Production Deployment
+# Deployment
 
-This project is configured for production deployment:
-* **Backend**: Deployed on [Render](https://render.com) (Web Service).
-* **Frontend**: Deployed on [Vercel](https://vercel.com) (Single Page App).
+## Backend (Render)
 
-### Production Setup & Deployment Steps
+Environment Variables:
 
-#### Backend (Render)
-1. Register/Login to Render and create a new **Web Service**.
-2. Connect your Git repository.
-3. Configure the following environment variables in the Render Dashboard:
-   - `DATABASE_URL`: Your production PostgreSQL connection string.
-   - `JWT_SECRET`: A secure secret string for JWT signing.
-   - `JWT_EXPIRY`: Lifespan of session tokens (e.g. `24h`).
-   - `JWT_COOKIE_NAME`: Session cookie name (default `auth_token`).
-   - `NODE_ENV`: Set to `production`.
-   - `CORS_ORIGIN`: Set to your Vercel URL (e.g., `https://expense-tracker.vercel.app`) or `*`.
-4. Set **Build Command** to `npm install` and **Start Command** to `npm start`.
-5. Deploy the service and verify it is running via `GET /api/health`.
+```env
+DATABASE_URL=
+JWT_SECRET=
+JWT_EXPIRY=
+JWT_COOKIE_NAME=
+NODE_ENV=production
+CORS_ORIGIN=
+```
 
-#### Frontend (Vercel)
-1. Register/Login to Vercel and import your repository.
-2. Edit project settings:
-   - **Root Directory**: `frontend`
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
-3. Add the following environment variable:
-   - `VITE_API_URL`: Set to your deployed backend URL, e.g., `https://expense-tracker-m6o9.onrender.com/api/v1`.
-4. Trigger the deployment. Vercel automatically reads [vercel.json](file:///Users/piyushsengar/Desktop/Expense%20Tracker/frontend/vercel.json) to handle SPA routing redirects.
+Build Command:
+
+```bash
+npm install && npx prisma generate
+```
+
+Start Command:
+
+```bash
+npm start
+```
+
+## Frontend (Vercel)
+
+Root Directory:
+
+```text
+frontend
+```
+
+Environment Variable:
+
+```env
+VITE_API_URL=https://your-render-backend-url/api/v1
+```
+
+---
+
+# AI Usage
+
+The following AI tools were used during development:
+
+* ChatGPT
+* Claude
+
+AI was used for:
+
+* Architecture discussions
+* Prisma schema design suggestions
+* CSV anomaly detection brainstorming
+* Documentation generation
+* Deployment troubleshooting
+
+All generated code was manually reviewed, tested, modified, and validated before inclusion in the final project.
+
+Detailed AI usage, prompts, mistakes, and corrections are documented in:
+
+```text
+AI_USAGE.md
+```
+
+---
+
+# Additional Documentation
+
+* README.md
+* SCOPE.md
+* DECISIONS.md
+* AI_USAGE.md
+
+---
+
+# Author
+
+Piyush Sengar

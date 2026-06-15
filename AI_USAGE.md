@@ -1,251 +1,543 @@
-# Authentication Module
+# AI Usage Report
 
-Prompt:
+## AI Tools Used
+
+### ChatGPT
+
+Used for:
+
+* Architecture planning
+* Prisma schema design
+* API implementation guidance
+* CSV import workflow design
+* Anomaly detection strategy
+* Deployment troubleshooting
+* Documentation generation
+
+### Claude
+
+Used for:
+
+* Code review
+* UI implementation suggestions
+* Refactoring recommendations
+* Edge-case analysis
+* Import workflow improvements
+
+---
+
+# Key Prompts Used
+
+## Prompt 1
+
 Implement JWT authentication using Prisma and bcrypt.
 
-AI Output:
-Generated auth service and controller.
+---
 
-Review:
-Verified password hashing manually.
+## Prompt 2
 
-Result:
-Accepted with modifications.
-
-## Authentication UI
-
-Prompt:
 Build Login and Register screens using React Hook Form.
 
-Issue:
-AI generated forms without loading states.
+---
 
-How I Caught It:
-Button remained clickable during API request.
+## Prompt 3
 
-Fix:
-Added loading state and disabled submit button during requests.
+Design a PostgreSQL schema for users, groups, memberships, expenses, settlements, and CSV imports.
 
-## Auth Context and Protected Routes
+---
 
-Prompt:
+## Prompt 4
+
+Implement anomaly detection for CSV imports supporting duplicate expenses, invalid dates, ambiguous dates, unknown members, former members, and settlement detection.
+
+---
+
+## Prompt 5
+
+Review the application for deployment on Render and Vercel and identify production issues.
+
+---
+
+# AI Review & Correction Log
+
+All AI-generated code was manually reviewed before being accepted.
+
+---
+
+## Case 1: Authentication UI
+
+### Prompt
+
+Build Login and Register screens using React Hook Form.
+
+### AI Output
+
+Generated functional authentication forms.
+
+### Issue
+
+Loading states were missing.
+
+### How I Caught It
+
+The submit button remained clickable during API requests, allowing duplicate submissions.
+
+### Change Made
+
+Added:
+
+* Loading indicators
+* Disabled submit button during requests
+* Better error handling
+
+### Result
+
+Accepted with modifications.
+
+---
+
+## Case 2: Session Persistence
+
+### Prompt
+
 Implement Auth Context and Protected Routes.
 
-Issue:
-AI forgot session restoration after page refresh.
+### AI Output
 
-How I Found It:
-User was logged out after browser refresh.
+Generated authentication context and route protection.
 
-Fix:
-Added localStorage token persistence and restore logic.
+### Issue
 
-## Group Management APIs
+User session was lost after page refresh.
 
-Prompt:
+### How I Caught It
+
+Refreshing the browser redirected authenticated users back to login.
+
+### Change Made
+
+Added:
+
+* Token persistence using localStorage
+* Session restoration logic on application startup
+
+### Result
+
+Accepted with modifications.
+
+---
+
+## Case 3: Membership Deletion
+
+### Prompt
+
 Implement Group Management APIs.
 
-Issue:
-AI suggested deleting membership records.
+### AI Output
 
-How I Found It:
-Historical expense calculations would lose member history.
+Suggested deleting membership records when removing users.
 
-Fix:
-Used leftAt timestamp instead of deletion.
+### Issue
 
-## Group UI Components
+Historical expense records would lose membership history.
 
-Prompt:
+### How I Caught It
+
+Historical balances became impossible to validate accurately.
+
+### Change Made
+
+Used:
+
+leftAt timestamp
+
+instead of deleting records.
+
+### Result
+
+Accepted with modifications.
+
+---
+
+## Case 4: Group UI Architecture
+
+### Prompt
+
 Build Group Management UI.
 
-Issue:
-AI placed API calls directly inside every component.
+### AI Output
 
-How I Found It:
-Code duplication and maintenance issues.
+Placed API calls directly inside components.
 
-Fix:
-Created centralized groupService.js.
+### Issue
 
-## Expense Management APIs
+Code duplication and maintenance problems.
 
-Prompt:
+### How I Caught It
+
+Multiple components repeated identical API logic.
+
+### Change Made
+
+Created:
+
+groupService.js
+
+for centralized API access.
+
+### Result
+
+Accepted with modifications.
+
+---
+
+## Case 5: Expense Participant Modeling
+
+### Prompt
+
 Implement Expense APIs.
 
-Issue:
-AI suggested storing participants as JSON array.
+### AI Output
 
-How I Found It:
-Would complicate joins and balance calculations.
+Suggested storing participants as JSON.
 
-Fix:
-Used ExpenseParticipant relational table.
+### Issue
 
-## Expense Management UI
+Complicated joins, balance calculations, and data integrity.
 
-Prompt:
+### How I Caught It
+
+Relational queries became unnecessarily complex.
+
+### Change Made
+
+Created:
+
+ExpenseParticipant
+
+relational table.
+
+### Result
+
+Accepted with modifications.
+
+---
+
+## Case 6: Expense Form Reusability
+
+### Prompt
+
 Build Expense Management UI.
 
-Issue:
-AI generated separate forms for create and edit.
+### AI Output
 
-How I Found It:
+Generated separate Create and Edit forms.
+
+### Issue
+
 Large amount of duplicated code.
 
-Fix:
-Created reusable ExpenseForm component.
+### How I Caught It
 
-## Expense Calculation Engine
+Both forms contained nearly identical logic.
 
-Prompt:
-Implement equal, exact, and percentage split engine.
+### Change Made
 
-Issue:
-AI ignored rounding differences in equal split.
+Created reusable:
 
-How I Found It:
-₹1000 split among 3 users resulted in total ₹999.99.
+ExpenseForm
 
-Fix:
-Adjusted final participant share to absorb rounding difference.
+component.
 
-## Balance Calculation Engine
+### Result
 
-Prompt:
+Accepted with modifications.
+
+---
+
+## Case 7: Split Calculation Engine
+
+### Prompt
+
+Implement equal, exact, and percentage split calculations.
+
+### AI Output
+
+Ignored rounding discrepancies.
+
+### Issue
+
+₹1000 split among 3 users produced ₹999.99 total allocation.
+
+### How I Caught It
+
+Verified totals after split calculations.
+
+### Change Made
+
+Adjusted final participant share to absorb rounding differences.
+
+### Result
+
+Accepted with modifications.
+
+---
+
+## Case 8: Balance Calculation Strategy
+
+### Prompt
+
 Implement balance calculation engine.
 
-Issue:
-AI suggested storing balances in database.
+### AI Output
 
-How I Found It:
-Balances can become stale after expense updates.
+Suggested storing balances directly in database.
 
-Fix:
-Calculate balances dynamically from expenses and shares.
+### Issue
 
-## Settlement Module
+Balances could become stale after expense updates.
 
-Prompt:
+### How I Caught It
+
+Expense edits produced inconsistent balance data.
+
+### Change Made
+
+Balances are calculated dynamically from:
+
+* Expenses
+* Participants
+* Settlements
+
+### Result
+
+Accepted with modifications.
+
+---
+
+## Case 9: Settlement Handling
+
+### Prompt
+
 Implement settlement module.
 
-Issue:
-AI suggested updating balances directly in database.
+### AI Output
 
-How I Found It:
-Balances would become inconsistent after expense edits.
+Suggested directly updating balances.
 
-Fix:
-Store settlement records and calculate balances dynamically.
+### Issue
 
-## Balance Dashboard
+Historical consistency would be lost.
 
-Prompt:
+### How I Caught It
+
+Balance recalculation became impossible to audit.
+
+### Change Made
+
+Stored settlement transactions separately.
+
+### Result
+
+Accepted with modifications.
+
+---
+
+## Case 10: Balance Dashboard
+
+### Prompt
+
 Build Balance Dashboard.
 
-Issue:
-AI displayed only net balances.
+### AI Output
 
-How I Found It:
-Users still had to manually calculate payments.
+Displayed only net balances.
 
-Fix:
-Added "Who Owes Whom" section showing debtor-creditor relationships.
+### Issue
 
-## CSV Parser
+Users still had to manually determine who should pay whom.
 
-Prompt:
+### How I Caught It
+
+Dashboard lacked actionable settlement information.
+
+### Change Made
+
+Added:
+
+Who Owes Whom
+
+view.
+
+### Result
+
+Accepted with modifications.
+
+---
+
+## Case 11: CSV Parsing
+
+### Prompt
+
 Implement CSV parser infrastructure.
 
-Issue:
-AI ignored row numbers during parsing.
+### AI Output
 
-How I Found It:
-Future anomaly reports could not reference original CSV rows.
+Ignored row numbers.
 
-Fix:
-Added rowNumber field to every parsed record.
+### Issue
 
-## CSV Upload Interface
+Anomaly reports could not reference original CSV rows.
 
-Prompt:
+### How I Caught It
+
+Import reports lacked traceability.
+
+### Change Made
+
+Added:
+
+rowNumber
+
+to all parsed records.
+
+### Result
+
+Accepted with modifications.
+
+---
+
+## Case 12: Upload Progress
+
+### Prompt
+
 Build CSV Upload Interface.
 
-Issue:
-AI forgot upload progress handling.
+### AI Output
 
-How I Found It:
-Large file uploads gave no user feedback.
+Did not include upload progress tracking.
 
-Fix:
+### Issue
+
+Users received no feedback during large uploads.
+
+### How I Caught It
+
+UI appeared frozen while uploading.
+
+### Change Made
+
 Added Axios upload progress tracking.
 
-## Anomaly Detection
+### Result
 
-Prompt:
+Accepted with modifications.
+
+---
+
+## Case 13: Ambiguous Date Handling
+
+### Prompt
+
 Implement anomaly detection engine.
 
-Issue:
-AI automatically corrected ambiguous dates.
+### AI Output
 
-How I Found It:
-Could silently convert 01/02/2026 into wrong date.
+Automatically converted ambiguous dates.
 
-Fix:
-Marked as AMBIGUOUS_DATE anomaly requiring review 
+### Issue
 
-## Import Report Generation
+Financial data could be incorrectly modified.
 
-Prompt:
+### How I Caught It
+
+Reviewed examples such as:
+
+01/02/2026
+
+which can represent multiple dates.
+
+### Change Made
+
+Created:
+
+AMBIGUOUS_DATE
+
+anomaly requiring manual review.
+
+### Result
+
+Accepted with modifications.
+
+---
+
+## Case 14: Import Report Generation
+
+### Prompt
+
 Generate import report from anomaly results.
 
-Issue:
-AI attempted to rerun anomaly detection during report generation.
+### AI Output
 
-How I Found It:
-Duplicate logic existed in report service.
+Re-ran anomaly detection during report generation.
 
-Fix:
-Report service only reads ImportBatch and ImportAnomaly data.
+### Issue
 
-## Import Review Workflow
+Duplicate business logic.
 
-Prompt:
+### How I Caught It
+
+Report generation duplicated existing anomaly services.
+
+### Change Made
+
+Reports read directly from:
+
+* ImportBatch
+* ImportAnomaly
+
+records.
+
+### Result
+
+Accepted with modifications.
+
+---
+
+## Case 15: Import Review Workflow
+
+### Prompt
+
 Implement anomaly review workflow.
 
-Issue:
-AI suggested directly updating imported rows.
+### AI Output
 
-How I Found It:
+Suggested overwriting imported values.
+
+### Issue
+
 Original imported values were lost.
 
-Fix:
-Introduced RowCorrection table and audit trail.
+### How I Caught It
 
-## Anomaly Review UI
+Audit history became impossible.
 
-Prompt:
-Build anomaly review dashboard.
+### Change Made
 
-Issue:
-AI generated card-based anomaly list.
+Introduced:
 
-How I Found It:
-Large imports became difficult to review.
+RowCorrection
 
-Fix:
-Switched to table-based interface with filtering.
+audit records.
 
-## Import Report Page
+### Result
 
-Prompt:
-Build import report page.
+Accepted with modifications.
 
-Issue:
-AI generated a single huge report component.
+---
 
-How I Found It:
-Difficult to maintain and extend.
+# Conclusion
 
-Fix:
-Split report into focused reusable components.
+AI tools accelerated development, but every generated output was manually reviewed, tested, and modified where necessary.
+
+No AI-generated code was accepted without validation against application requirements, data integrity requirements, and production deployment constraints.

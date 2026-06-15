@@ -1,158 +1,387 @@
-# Decision 1
+# Architectural & Design Decision Log
 
-Decision:
-Use PostgreSQL
+This document records significant technical and product decisions made during development of the Expense Tracker application.
 
-Alternatives:
-- MongoDB
-- MySQL
+---
 
-Reason:
-Assignment explicitly requires a relational database.
+# Decision 1: Database Selection
 
-# Decision 2
+## Problem
 
-Decision:
-Use Membership table
+The application requires managing users, groups, memberships, expenses, settlements, and audit history.
 
-Reason:
-Members can join and leave groups over time.
-Historical balances must remain accurate.
+## Options Considered
 
-# Decision 3
+1. MongoDB
+2. MySQL
+3. PostgreSQL
 
-Decision:
-Use React Context for authentication.
+## Decision
 
-Alternatives:
-Redux
-Zustand
+Use PostgreSQL.
 
-Reason:
-Authentication state is small.
-Context API is sufficient.
+## Reason
 
-# Decision 4
+The application contains highly relational data and requires joins, constraints, and transactional consistency. PostgreSQL provides strong relational modeling and data integrity.
 
-Decision:
-Use Membership History
+---
 
-Alternative:
-Delete members directly
+# Decision 2: Membership Modeling
 
-Reason:
-Users join and leave over time.
-Historical balances must remain accurate.
+## Problem
 
-# Decision 5
+Users can join and leave groups over time.
 
-Decision:
+## Options Considered
+
+1. Store members directly inside Group
+2. Separate Membership table
+
+## Decision
+
+Use a dedicated Membership table.
+
+## Reason
+
+Allows tracking membership history and supports former-member anomaly detection.
+
+---
+
+# Decision 3: Authentication State Management
+
+## Problem
+
+Frontend requires authenticated sessions and protected routes.
+
+## Options Considered
+
+1. Redux
+2. Zustand
+3. React Context API
+
+## Decision
+
+Use React Context API.
+
+## Reason
+
+Authentication state is relatively small and does not require a full state-management library.
+
+---
+
+# Decision 4: Membership History Preservation
+
+## Problem
+
+Users may leave groups, but historical expenses must remain valid.
+
+## Options Considered
+
+1. Delete members permanently
+2. Maintain membership history
+
+## Decision
+
+Maintain membership history.
+
+## Reason
+
+Historical balances and audit records must remain accurate.
+
+---
+
+# Decision 5: Expense Participant Modeling
+
+## Problem
+
+Expenses can be shared among multiple users.
+
+## Options Considered
+
+1. Store participant list as JSON
+2. Use ExpenseParticipant table
+
+## Decision
+
 Use ExpenseParticipant table.
 
-Alternative:
-Store participants as JSON.
+## Reason
 
-Reason:
-Relational integrity.
-Split calculations become easier.
+Provides relational integrity, easier querying, and cleaner split calculations.
 
-# Decision 6
+---
 
-Decision:
-Store calculated participant shares.
+# Decision 6: Store Participant Shares
 
-Alternative:
-Calculate every time.
+## Problem
 
-Reason:
-Performance and auditability.
+Participant allocations are required for balance calculations.
 
-# Decision 7
+## Options Considered
 
-Decision:
+1. Recalculate shares every time
+2. Persist participant shares
+
+## Decision
+
+Persist participant shares.
+
+## Reason
+
+Improves performance and preserves historical calculations.
+
+---
+
+# Decision 7: Balance Calculation Strategy
+
+## Problem
+
+User balances must remain accurate after expense changes.
+
+## Options Considered
+
+1. Store balances in database
+2. Calculate balances dynamically
+
+## Decision
+
 Calculate balances dynamically.
 
-Alternative:
-Store balances in database.
+## Reason
 
-Reason:
-Balances are derived values and may become inconsistent.
+Balances are derived values and storing them risks inconsistency.
 
-# Decision 8
+---
 
-Decision:
+# Decision 8: Settlement Handling
+
+## Problem
+
+Users need to record payments made between members.
+
+## Options Considered
+
+1. Modify balances directly
+2. Store settlement transactions separately
+
+## Decision
+
 Store settlements separately.
 
-Alternative:
-Update balances directly.
+## Reason
 
-Reason:
-Balances are derived values.
-Settlement history must remain auditable.
+Provides a complete financial history and improves auditability.
 
-# Decision 9
+---
 
-Decision:
-Show debtor-creditor relationships.
+# Decision 9: Debt Visualization
 
-Alternative:
-Show only net balances.
+## Problem
 
-Reason:
-Provides actionable settlement information.
+Users need actionable information for settling debts.
 
-# Decision 10
+## Options Considered
 
-Decision:
-Store ImportBatch records.
+1. Display net balances only
+2. Display debtor-creditor relationships
 
-Alternative:
-Process CSV directly without history.
+## Decision
 
-Reason:
-Auditability and import tracking.
+Display debtor-creditor relationships.
 
+## Reason
 
-# Decision 11
+Provides clear information about who owes whom.
 
-Decision:
-Generate import reports from stored anomaly records.
+---
 
-Alternative:
-Recalculate anomalies during report generation.
+# Decision 10: Import Tracking
 
-Reason:
-Avoid duplicate business logic and ensure consistency.
+## Problem
 
-# Decision 12
+CSV imports must be traceable and reviewable.
 
-Decision:
-Store corrections separately.
+## Options Considered
 
-Alternative:
-Overwrite imported values.
+1. Process CSV directly
+2. Track imports using ImportBatch
 
-Reason:
-Maintain complete audit trail.
+## Decision
 
-# Decision 13
+Use ImportBatch records.
 
-Decision:
-Use table-based review dashboard.
+## Reason
 
-Alternative:
-Card-based review UI.
+Supports auditability, reporting, and historical tracking.
 
-Reason:
-Review workflows are data-intensive and benefit from tabular display.
+---
 
-# Decision 14
+# Decision 11: Anomaly Detection Storage
 
-Decision:
-Provide downloadable import reports.
+## Problem
 
-Alternative:
-Display report only in UI.
+Import anomalies must be reviewed after detection.
 
-Reason:
-Reports may be shared, archived, or reviewed later.
+## Options Considered
+
+1. Recalculate anomalies on demand
+2. Store anomaly records
+
+## Decision
+
+Store anomaly records.
+
+## Reason
+
+Improves consistency and avoids duplicate business logic.
+
+---
+
+# Decision 12: Data Correction Strategy
+
+## Problem
+
+Imported data may require manual corrections.
+
+## Options Considered
+
+1. Overwrite original values
+2. Preserve original values and store corrections
+
+## Decision
+
+Preserve originals and store corrections separately.
+
+## Reason
+
+Maintains a complete audit trail.
+
+---
+
+# Decision 13: Review Interface Design
+
+## Problem
+
+Users need to review large numbers of anomalies efficiently.
+
+## Options Considered
+
+1. Card-based UI
+2. Table-based dashboard
+
+## Decision
+
+Use a table-based dashboard.
+
+## Reason
+
+Review workflows are data-heavy and easier to manage in tabular form.
+
+---
+
+# Decision 14: Import Report Generation
+
+## Problem
+
+Users need visibility into import results.
+
+## Options Considered
+
+1. Display report only in UI
+2. Generate downloadable reports
+
+## Decision
+
+Generate downloadable reports.
+
+## Reason
+
+Reports can be archived, shared, and reviewed later.
+
+---
+
+# Decision 15: Ambiguous Date Handling
+
+## Problem
+
+Certain dates can be interpreted in multiple formats.
+
+Example:
+
+03/04/2025
+
+## Options Considered
+
+1. Automatically convert dates
+2. Flag as anomaly
+
+## Decision
+
+Flag as AMBIGUOUS_DATE anomaly.
+
+## Reason
+
+Financial data should not be modified based on assumptions.
+
+---
+
+# Decision 16: Unknown Member Handling
+
+## Problem
+
+CSV may reference members not found in the selected group.
+
+## Options Considered
+
+1. Automatically create users
+2. Flag anomaly
+
+## Decision
+
+Flag UNKNOWN_MEMBER anomaly.
+
+## Reason
+
+Automatically creating users could introduce invalid financial records.
+
+---
+
+# Decision 17: Former Member Handling
+
+## Problem
+
+Expenses may reference users who previously belonged to the group.
+
+## Options Considered
+
+1. Treat as unknown member
+2. Create dedicated anomaly type
+
+## Decision
+
+Create FORMER_MEMBER anomaly.
+
+## Reason
+
+The user exists, but membership validity must be reviewed separately.
+
+---
+
+# Decision 18: Settlement Recognition
+
+## Problem
+
+Settlement transactions may be imported as expenses.
+
+## Options Considered
+
+1. Import as expense
+2. Flag for review
+
+## Decision
+
+Flag SETTLEMENT_AS_EXPENSE anomaly.
+
+## Reason
+
+Settlements and expenses represent different financial operations and should be handled separately.
